@@ -1,0 +1,119 @@
+{
+	"plugin_id": "filterpool",
+	"name_fr": "FilterPool",
+	"icon": "smartpool.png",
+	"version": "0.0.1",
+	"creation_date": "2020-04-25",
+	"modification_date": "2020-04-25",
+	"author": "Aurelien Cepede",
+	"description_fr": "Programme filtration automatique",
+	"description_en": "",
+	"description_es": "",
+	"description_it": "",
+	"description_de": "",
+	"forum_link": "",
+	"parameters":
+	[
+		{
+			"parameter": "moteur_piscine",
+			"description": "<b>Moteur piscine : ",
+			"xtype": "combo",
+			"field": "store:getCombo('/json/list_all.php?actuator_only=1&value_type=list&has_value=0,100'), displayField: 'label', valueField: 'id', typeAhead: true, forceSelection: true, triggerAction: 'all', selectOnFocus: true, editable: false, shadow:true, mode: 'local', width: 250, listWidth: 300, allowBlank: false"
+		},
+		{
+			"parameter": "sonde_eau",
+			"description": "<b>Thermomètre piscine (To): ",
+			"xtype": "combo",
+			"field": "store : getCombo('/json/list_all.php?value_type=float&filter_unit=°C&sensor_only=1'), displayField: 'label', valueField: 'id', triggerAction: 'all', selectOnFocus: true, editable: false, shadow:true, mode: 'local', width: 250, listWidth: 300, allowBlank: false"
+		},
+    {
+      "parameter": "sonde_air",
+      "description": "<b>Thermomètre air (Ta): ",
+      "xtype": "combo",
+      "field": "store : getCombo('/json/list_all.php?value_type=float&filter_unit=°C&sensor_only=1'), displayField: 'label', valueField: 'id', triggerAction: 'all', selectOnFocus: true, editable: false, shadow:true, mode: 'local', width: 250, listWidth: 300, allowBlank: false"
+    },
+		{
+			"parameter": "debut",
+			"description": "Heure de début des filtrations",
+			"xtype": "textfield",
+			"default_value": "08:00",
+			"field": "allowBlank: false, maxLength:5, minLength:5, width: 50, maskRe:/[0-9:\\.]/, regex:/^([0-9]|0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]$/, regexText:'Format invalide, format HH:mn'"
+		},
+    {
+      "parameter": "mode_froid",
+      "description": "Mode froid (< 10°C)",
+      "xtype": "textfield",
+      "default_value": "0*T+1",
+      "field": "allowBlank: false, minLength:5, width: 50, maskRe:/[0-9\\*\\.\\+T]/, regex:/^[1-9]*[0-9](\\.[0-9]*)?\\*T\\+[0-9]$/, regexText:'Format invalide, format t*T+x'"
+    },
+    {
+      "parameter": "mode_tempere",
+      "description": "Mode tempéré (de 10°C à 27°C)",
+      "xtype": "textfield",
+      "default_value": "0.2*T+0",
+      "field": "allowBlank: false, minLength:5, width: 50, maskRe:/[0-9\\*\\.\\+T]/, regex:/^[1-9]*[0-9](\\.[0-9]*)?\\*T\\+[0-9]$/, regexText:'Format invalide, format t*T+x'"
+    },
+    {
+      "parameter": "mode_chaud",
+      "description": "Mode chaud (> 27°C)",
+      "xtype": "textfield",
+      "default_value": "0.25*T+0",
+      "field": "allowBlank: false, minLength:5, width: 50, maskRe:/[0-9\\*\\.\\+T]/, regex:/^[1-9]*[0-9](\\.[0-9]*)?\\*T\\+[0-9]$/, regexText:'Format invalide, format t*T+x'"
+    }
+  ],
+  "scripts":
+  [
+    {
+      "name": "filterpool.php"
+    }
+  ],
+  "devices":
+  [
+    {
+      "device_id": "Filterpool_Mode",
+      "module_id": "51",
+      "parent_id": "Filterpool_Programmation",
+      "type": "http",
+      "name_fr": "plugin.name - Mode ",
+      "utilisation_id":"35",
+      "parameters":
+      {
+        "VAR1": "plugin.parameters.sonde",
+        "VAR2": "plugin.parameters.pompe",
+        "VAR3" : "plugin.parameters.debut",
+        "value_type": "list",
+        "ignore_errors": 1,
+        "RAW_URL": "http://localhost/script/?exec=smartpool.php",
+        "RAW_XPATH": "//Mode",
+        "POLLING": "1"
+      },
+      "values":
+      [
+        { "value": "0", "icon": "arret.png", "description": "Programme à l'arrêt"},
+        { "value": "10", "icon": "hiver.png", "description": "Froid extrème"},
+        { "value": "11", "icon": "hiver.png", "description": "Hivernage"},
+        { "value": "12", "icon": "ete.png", "description": "Tempéré"},
+        { "value": "13", "icon": "ete.png", "description": "Été"},
+        { "value": "14", "icon": "canicule.png", "description": "Canicule"}
+      ]        
+    }
+  ],
+  "rules":
+  [
+    {
+     "name_fr": "plugin.name - Programmation",
+     "criterias":
+     [
+       { "device_id": "plugin.devices.Filterpool_Programmation", "type": "c" }
+     ],
+     "actions":
+     [
+      { "device_id": "plugin.devices.Filterpool_Mode", "type": "direct", "action": "0"}
+    ]
+
+   }
+  ]
+}
+
+
+
